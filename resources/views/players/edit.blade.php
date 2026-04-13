@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Create Product</title>
+    <title>Edit Player</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -268,6 +268,18 @@
             margin-bottom: 1.5rem;
         }
 
+        .player-id-badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--accent-cyan);
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header-title {
@@ -310,12 +322,16 @@
 <div class="container py-4">
     <div class="header-section">
         <h1 class="header-title">
-            <i class="fas fa-plus-circle icon-wrapper"></i>Add Player
+            <i class="fas fa-user-edit icon-wrapper"></i>Edit Player
         </h1>
-        <p class="header-subtitle">Add New Player to Selection</p>
+        <p class="header-subtitle">Update Player Information</p>
     </div>
 
     <div class="form-container">
+        <div class="player-id-badge">
+            <i class="fas fa-hashtag"></i> Player ID: {{ str_pad($player->id, 3, '0', STR_PAD_LEFT) }}
+        </div>
+
         @if ($errors->any())
             <div class="alert-futuristic">
                 <strong><i class="fas fa-exclamation-triangle"></i> Validation Errors:</strong>
@@ -327,12 +343,13 @@
             </div>
         @endif
 
-        <form action="{{ route('products.store') }}" method="POST">
+        <form action="/players/{{ $player->id }}" method="POST">
             @csrf
+            @method('PUT')
             
             <div class="mb-4">
                 <label for="name" class="form-label">
-                    <i class="fas fa-box"></i>
+                    <i class="fas fa-user"></i>
                     Player Name
                 </label>
                 <input 
@@ -340,8 +357,8 @@
                     class="form-control @error('name') is-invalid @enderror" 
                     id="name" 
                     name="name" 
-                    value="{{ old('name') }}"
-                    placeholder="Enter product name..."
+                    value="{{ old('name', $player->name) }}"
+                    placeholder="Enter player name..."
                     required
                     autofocus
                 >
@@ -353,14 +370,14 @@
             <div class="mb-4">
                 <label for="price" class="form-label">
                     <i class="fas fa-dollar-sign"></i>
-                    Fee
+                    Talent Fee
                 </label>
                 <input 
                     type="number" 
                     class="form-control @error('price') is-invalid @enderror" 
                     id="price" 
                     name="price" 
-                    value="{{ old('price') }}"
+                    value="{{ old('price', $player->price / 100) }}"
                     placeholder="0.00"
                     step="0.01"
                     min="0"
@@ -373,9 +390,9 @@
 
             <div class="button-group">
                 <button type="submit" class="btn-futuristic">
-                    <i class="fas fa-save"></i> Add Player
+                    <i class="fas fa-save"></i> Update Player
                 </button>
-                <a href="{{ route('products.index') }}" class="btn-secondary-futuristic">
+                <a href="/players" class="btn-secondary-futuristic">
                     <i class="fas fa-arrow-left"></i> Back to List
                 </a>
             </div>

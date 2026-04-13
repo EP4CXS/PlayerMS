@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Products</title>
+    <title>Players</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -203,27 +203,27 @@
             font-family: 'Courier New', monospace;
         }
 
-        .product-name {
+        .player-name {
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .product-name::before {
+        .player-name::before {
             content: '▸';
             color: var(--accent-purple);
             font-size: 1.2rem;
         }
 
-        .product-price {
+        .player-price {
             font-weight: 600;
             color: var(--accent-cyan);
             font-family: 'Courier New', monospace;
             font-size: 1.1rem;
         }
 
-        .product-price::before {
+        .player-price::before {
             content: '$';
             margin-right: 2px;
             opacity: 0.7;
@@ -410,6 +410,74 @@
             box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
         }
 
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            background: var(--input-bg, rgba(255, 255, 255, 0.08));
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1),
+                        0 0 20px rgba(0, 212, 255, 0.2);
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .search-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .clear-search {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            padding: 0.8rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-search:hover {
+            color: var(--text-primary);
+        }
+
         @media (max-width: 768px) {
             .action-bar {
                 justify-content: center;
@@ -437,7 +505,7 @@
 <div class="container py-4">
     <div class="header-section">
         <h1 class="header-title">
-            <i class="fas fa-cube icon-wrapper"></i>Players
+            <i class="fas fa-users icon-wrapper"></i>Players
         </h1>
         <p class="header-subtitle">Player Management System</p>
     </div>
@@ -449,12 +517,27 @@
         </div>
     @endif
 
-    <div class="action-bar">
-        <a href="{{ route('products.create') }}" class="btn-create">
+    <form action="/players" method="GET" class="search-bar">
+        <input 
+            type="text" 
+            name="search" 
+            class="search-input" 
+            placeholder="Search players by name..." 
+            value="{{ request('search') }}"
+        >
+        <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i> Search
+        </button>
+        @if(request('search'))
+            <a href="/players" class="clear-search">
+                <i class="fas fa-times"></i> Clear
+            </a>
+        @endif
+        <a href="/players/create" class="btn-create">
             <i class="fas fa-plus-circle"></i>
-            Create New Player
+            Add New Player
         </a>
-    </div>
+    </form>
 
     <div class="table-container">
         <div class="table-responsive">
@@ -462,23 +545,23 @@
                 <thead>
                     <tr>
                         <th><i class="fas fa-hashtag"></i> ID</th>
-                        <th><i class="fas fa-box"></i> Name</th>
+                        <th><i class="fas fa-user"></i> Name</th>
                         <th><i class="fas fa-dollar-sign"></i> Talent Fee</th>
                         <th><i class="fas fa-cog"></i> Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($products as $product)
+                    @forelse($players as $player)
                         <tr>
-                            <td>{{ str_pad($loop->iteration, 3, '0', STR_PAD_LEFT) }}</td>
-                            <td><span class="product-name">{{ $product->name }}</span></td>
-                            <td><span class="product-price">{{ number_format($product->price, 2) }}</span></td>
+                            <td>{{ str_pad($player->id, 3, '0', STR_PAD_LEFT) }}</td>
+                            <td><span class="player-name">{{ $player->name }}</span></td>
+                            <td><span class="player-price">{{ number_format($player->price / 100, 2) }}</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{{ route('products.edit', $product->id) }}" class="btn-edit">
+                                    <a href="/players/{{ $player->id }}/edit" class="btn-edit">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                    <form action="/players/{{ $player->id }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this player?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-delete">
@@ -491,8 +574,14 @@
                     @empty
                         <tr>
                             <td colspan="4" class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <div class="empty-state-text">No products found in the database.</div>
+                                <i class="fas fa-{{ request('search') ? 'search' : 'inbox' }}"></i>
+                                <div class="empty-state-text">
+                                    @if(request('search'))
+                                        No players found matching "{{ request('search') }}".
+                                    @else
+                                        No players found in the database.
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endforelse

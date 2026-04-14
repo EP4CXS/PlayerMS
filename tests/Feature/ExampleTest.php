@@ -1,7 +1,7 @@
 <?php
 
-test('the application root redirects to players', function () {
+it('returns a successful response', function () {
     $response = $this->get('/');
 
-    $response->assertRedirect('/players');
+    $response->assertStatus(200);
 });

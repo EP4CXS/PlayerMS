@@ -40,7 +40,7 @@ class ApiPlayerController extends Controller
 
         $player = $this->playerService->createPlayer($request->validated(), $request->user());
 
-        return $this->createdResponse($player);
+        return response()->json(['message' => 'Player created successfully'], 201);
     }
 
     public function show(Request $request, int $id): JsonResponse
